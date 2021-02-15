@@ -7,8 +7,9 @@ license = "MIT"
 readme = "README.md"
 
 [tool.poetry.dependencies]
-python = "^3.5"
-zeep = "^3.4.0"
+python = "^3.6"
+django = "^2.2"
+zeep = "^4.0.0"
 django-hashid-field = "^3.1.1"
 
 [tool.poetry.dev-dependencies]
