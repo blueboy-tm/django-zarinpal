@@ -55,5 +55,5 @@ class Transaction(models.Model):
         ordering = ('created_at',)
 
     def __str__(self) -> str:
-        return self.id
+        return f'{self.id}'
 
