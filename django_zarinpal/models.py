@@ -49,18 +49,6 @@ class Transaction(models.Model):
     def is_successful(self):
         return self.status == "SUCCESS"
 
-    def get_transaction_start_url(self, request=None):
-        if self.is_test is False:
-            return ZARINPAL_START_GATEWAY + self.authority
-        else:
-            relative_start_url = reverse(
-                "django_zarinpal:sandbox-payment",
-                kwargs={"authority_start": self.authority}
-            )
-            if request:
-                return request.build_absolute_uri(relative_start_url)
-            else:
-                return relative_start_url
     class Meta:
         verbose_name = 'تراکنش زرین‌پال'
         verbose_name_plural = 'تراکنش های زرین‌پال'

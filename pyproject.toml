@@ -2,7 +2,7 @@
 name = "django-zarinpal"
 version = "2.0.0"
 description = "integrate django payments with zarrinpal"
-authors = ["arshiaihammi@gmail.com fork from glyphack <sh.hooshyari@gmail.com>"]
+authors = ["blueboy-tm <arshiaihammi@gmail.com>"]
 license = "MIT"
 readme = "README.md"
 

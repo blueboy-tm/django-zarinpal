@@ -1,6 +1,6 @@
 # django-zarinpal
 
-Fork from [Glyphack/django-zarinpal](https://github.com/Glyphack/django-zarinpal)
+Forked from [Glyphack/django-zarinpal](https://github.com/Glyphack/django-zarinpal)
 
 Integrate django payments with [zarinpal](https://www.zarinpal.com)
 
@@ -52,3 +52,21 @@ def start_payment(request):
     return redirect(result) # result is the url for starting transaction
 ```
 
+
+You can use verify_transaction to verify the transaction
+```python
+from django_zarinpal.services import verify_transaction
+from django_zarinpal.exceptions import TransactionDoesNotExist
+from django.http import HttpResponse, Http404
+
+def payment_callback(request):
+    authority = request.GET.get("Authority")
+    status = request.GET.get("Status")
+    try:
+        transaction = verify_transaction(status, authority)
+        if transaction.is_successful():
+            return HttpResponse('Thanks for payment.')
+        return HttpResponse(transaction.failure_reason)
+    except TransactionDoesNotExist:
+        raise Http404
+```
