@@ -3,37 +3,32 @@ from django.contrib.auth import get_user_model
 from django.db import models
 from django.urls import reverse
 from django.utils import timezone
-from hashid_field import HashidAutoField
 
 from django_zarinpal.config import ZARINPAL_START_GATEWAY
 
 
 class Transaction(models.Model):
-    order_number = HashidAutoField(
-        primary_key=True,
-        allow_int_lookup=True,
-        salt=getattr(settings, "HASHID_FIELD_SALT", None)
-    )
-    user = models.ForeignKey(get_user_model(), on_delete=models.CASCADE)
-    amount = models.DecimalField(max_digits=64, decimal_places=2)
-    authority = models.CharField(max_length=100, blank=True, null=True)
-    ref_id = models.IntegerField(null=True, blank=True)
-    description = models.TextField(blank=True, null=True)
-    created_at = models.DateTimeField(auto_now_add=True)
-    verified_at = models.DateTimeField(blank=True, null=True)
+    user = models.ForeignKey(get_user_model(), on_delete=models.CASCADE, verbose_name='کاربر', null=True, blank=True)
+    amount = models.DecimalField(max_digits=64, decimal_places=2, verbose_name='مقدار')
+    authority = models.CharField(max_length=100, blank=True, null=True, verbose_name='شناسه مرجع')
+    ref_id = models.IntegerField(null=True, blank=True, verbose_name='کد پیگیری')
+    description = models.TextField(blank=True, null=True, verbose_name='توضیحات')
+    created_at = models.DateTimeField(auto_now_add=True, verbose_name='تاریخ ایجاد')
+    verified_at = models.DateTimeField(blank=True, null=True, verbose_name='تاریخ تایید')
 
     TRANSACTION_STATUS_CHOICES = (
-        ("PENDING", "Transaction has just started"),
-        ("FAILED", "Transaction has failed"),
-        ("SUCCESS", "Transaction has successfully done"),
+        ("PENDING", "تراکنش شروع شده است"),
+        ("FAILED", "تراکنش با خطا مواجه شد"),
+        ("SUCCESS", "نراکنش با موفقیت انجام شد"),
     )
     status = models.CharField(
         max_length=100,
         choices=TRANSACTION_STATUS_CHOICES,
-        default="PENDING"
+        default="PENDING",
+        verbose_name='وضعیت'
     )
-    failure_reason = models.CharField(max_length=100, blank=True, null=True)
-    is_test = models.BooleanField(default=False)
+    failure_reason = models.CharField(max_length=100, blank=True, null=True, verbose_name='دلیل خطا')
+    is_test = models.BooleanField(default=False, verbose_name='آیا تراکنش آزمایشی است؟')
 
     def success(self, ref_id):
         self.ref_id = ref_id
@@ -66,3 +61,11 @@ class Transaction(models.Model):
                 return request.build_absolute_uri(relative_start_url)
             else:
                 return relative_start_url
+    class Meta:
+        verbose_name = 'تراکنش زرین‌پال'
+        verbose_name_plural = 'تراکنش های زرین‌پال'
+        ordering = ('created_at',)
+
+    def __str__(self) -> str:
+        return self.id
+

@@ -5,7 +5,8 @@ from zeep import Client
 
 from django_zarinpal.config import (
     ZARINPAL_START_GATEWAY,
-    ZARINPAL_SANDBOX, ZARINPAL_VERIFY_TRANSACTION_VIEW)
+    ZARINPAL_SANDBOX
+)
 from django_zarinpal.config import (
     ZARINPAL_WEBSERVICE,
     ZARINPAL_MERCHANT_ID
@@ -18,22 +19,22 @@ from django_zarinpal.exceptions import TransactionDoesNotExist
 from django_zarinpal.models import Transaction
 
 
-def start_transaction(transaction_data: Dict) -> str:
+def start_transaction(amount, callback_url,  user=None, mobile=None, email=None, description='null') -> str:
     transaction = Transaction(
-        user=transaction_data["user"],
-        amount=transaction_data["amount"],
-        description=transaction_data["description"],
+        user=user,
+        amount=amount,
+        description=description,
         is_test=ZARINPAL_SANDBOX
     )
 
     client = Client(ZARINPAL_WEBSERVICE)
     result = client.service.PaymentRequest(
         ZARINPAL_MERCHANT_ID,
-        transaction_data["amount"],
-        transaction_data["description"],
-        transaction_data["email"],
-        transaction_data["mobile"],
-        reverse(ZARINPAL_VERIFY_TRANSACTION_VIEW)
+        amount,
+        description,
+        email,
+        mobile,
+        callback_url,
     )
 
     if result.Status == 100:
@@ -41,11 +42,9 @@ def start_transaction(transaction_data: Dict) -> str:
         transaction.save()
         return ZARINPAL_START_GATEWAY + result.Authority
     elif result.Status == -3:
-        raise AmountIsLessThanMinimum(
-            f"response:{result}, transaction data: {transaction_data}")
+        raise AmountIsLessThanMinimum(f"response:{result}")
     else:
-        raise CouldNotStartTransaction(
-            f"response:{result}, transaction data: {transaction_data}")
+        raise CouldNotStartTransaction(f"response:{result}")
 
 
 def verify_transaction(status: str, authority: int) -> Transaction:
@@ -66,6 +65,6 @@ def verify_transaction(status: str, authority: int) -> Transaction:
         else:
             transaction.fail(result.Status)
     else:
-        transaction.fail("Canceled")
+        transaction.fail("انصراف توسط کاربر")
 
     return transaction

@@ -1,19 +1,16 @@
 # django-zarinpal
 
+Fork from [Glyphack/django-zarinpal](https://github.com/Glyphack/django-zarinpal)
+
 Integrate django payments with [zarinpal](https://www.zarinpal.com)
 
-
-Features
---------
-
-- sending signal on verifying transaction to let other apps know about it
 
 Quickstart
 ----------
 
 Install django-zarinpal::
 
-    pip install django-zarinpal
+    pip install git+https://github.com/blueboy-tm/django-zarinpal.git@master
 
 Add it to your `INSTALLED_APPS`:
 
@@ -21,22 +18,11 @@ Add it to your `INSTALLED_APPS`:
 
     INSTALLED_APPS = (
         ...
-        'zarinpal',
+        'django_zarinpal',
         ...
     )
 
-Add django-zarinpal's URL patterns:
 
-.. code-block:: python
-
-    import zarrinpal
-
-
-    urlpatterns = [
-        ...
-        path('zarinpal/', include(zarinpal_urls)),
-        ...
-    ]
 
 
 
@@ -45,8 +31,6 @@ Add django-zarinpal's URL patterns:
 set these variables in your settings file:
 
 ```python
-
-ZARINPAL_CALLBACK_URL: bool # the url user redirects to after transaction
 
 ZARINPAL_SIMULATION: bool # is transactions for test?
 
@@ -62,33 +46,9 @@ from django_zarinpal.services import start_transaction
 
 def start_payment(request):
     result = start_transaction(
-        {
-            "user": request.user,
-            "amount": 10000,
-            "description": "transaction description",
-            "mobile": "09123456789",
-            "email": "string",
-        }
+        amount=10000, callback_url='/',  user=request.user, mobile=None, email=None,
+        description='transaction description'
     )
     return redirect(result) # result is the url for starting transaction
 ```
 
-If you specify a callback_url in transaction data after completing transaction zarinpal will redirect user to the page you specified with two get arguments:
-
-1.order_number: str
-
-2.success: boolean
-
-### Custom verification
-
-If you want to handle verifying transaction your self you can define your view and 
-address it in settings with ZARINPAL_VERIFY_TRANSACTION_VIEW. you can use function
-`verify_transaction` to verify a transaction.
-
-If you don't specify this view, package will use default view for verifying transactions.
-
-Tests
---------
-Running tests: ::
-
-    python manage.py runtests.py
