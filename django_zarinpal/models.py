@@ -1,7 +1,5 @@
-from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.db import models
-from django.urls import reverse
 from django.utils import timezone
 
 from django_zarinpal.config import ZARINPAL_START_GATEWAY
@@ -11,7 +9,7 @@ class Transaction(models.Model):
     user = models.ForeignKey(get_user_model(), on_delete=models.CASCADE, verbose_name='کاربر', null=True, blank=True)
     amount = models.DecimalField(max_digits=64, decimal_places=2, verbose_name='مقدار')
     authority = models.CharField(max_length=100, blank=True, null=True, verbose_name='شناسه مرجع')
-    ref_id = models.IntegerField(null=True, blank=True, verbose_name='کد پیگیری')
+    ref_id = models.BigIntegerField(null=True, blank=True, verbose_name='کد پیگیری')
     description = models.TextField(blank=True, null=True, verbose_name='توضیحات')
     created_at = models.DateTimeField(auto_now_add=True, verbose_name='تاریخ ایجاد')
     verified_at = models.DateTimeField(blank=True, null=True, verbose_name='تاریخ تایید')
